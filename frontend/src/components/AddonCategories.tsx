@@ -21,7 +21,6 @@ const AddonCategories = () => {
           }}
         >
           <TextField label="Name" variant="outlined" />
-          <TextField label="Price" variant="outlined" type="number" />
         </Box>
         <Box sx={{ mt: "2rem" }}>
           <Button variant="contained">Addon categories</Button>
