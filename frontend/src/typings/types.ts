@@ -4,7 +4,7 @@ interface BaseType {
 }
 export interface Menu extends BaseType {
   price: number;
-  is_available?: boolean;
+  isAvailable?: boolean;
 }
 export interface MenuCategory extends BaseType {}
 
@@ -20,4 +20,11 @@ export interface AddonCategory extends BaseType {
 
 export interface Locations extends BaseType {
   adress: string;
+}
+
+export interface MenuLocations {
+  id: number;
+  menu_id: number;
+  location_id: number;
+  is_available?: boolean;
 }

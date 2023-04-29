@@ -5,6 +5,7 @@ import {
   Locations,
   Menu,
   MenuCategory,
+  MenuLocations,
 } from "../typings/types";
 import { config } from "../config/config";
 
@@ -14,7 +15,7 @@ interface AppContextType {
   addons: Addon[];
   addonCategories: AddonCategory[];
   locations: Locations[];
-  menuLocations: any[];
+  menuLocations: MenuLocations[];
   fetchData: () => void;
 }
 const defaultContext: AppContextType = {

@@ -49,7 +49,6 @@ app.put("/menus/:menuId", async (req: Request, res: Response) => {
     "UPDATE menus SET name = $1, price = $2 WHERE id = ($3) RETURNING *";
   const values = [updateMenusName, updateMenusPrice, menuId];
   const result = await pool.query(text, values);
-  console.log(result.rows);
   res.send(result.rows);
 });
 

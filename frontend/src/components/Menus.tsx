@@ -4,6 +4,7 @@ import Layout from "./Layout";
 import { useState } from "react";
 import { Menu } from "../typings/types";
 import { config } from "../config/config";
+import { Link } from "react-router-dom";
 
 const Menus = () => {
   const { fetchData, menus } = UseAppContext();
@@ -81,11 +82,13 @@ const Menus = () => {
         <Stack direction="column" spacing={3}>
           {menus.map((item) => {
             return (
-              <Chip
-                key={item.id}
-                label={item.name}
-                onDelete={() => handleDelete(item.id)}
-              />
+              <Link key={item.id} to={`/menus/${item.id}`}>
+                <Chip
+                  label={item.name}
+                  sx={{ cursor: "pointer" }}
+                  onDelete={() => handleDelete(item.id)}
+                />
+              </Link>
             );
           })}
         </Stack>

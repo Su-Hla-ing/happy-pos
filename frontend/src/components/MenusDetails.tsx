@@ -7,19 +7,30 @@ import { config } from "../config/config";
 import { useEffect, useState } from "react";
 
 const MenusDetails = () => {
-  const { menus } = UseAppContext();
+  const { menus, menuLocations } = UseAppContext();
   console.log("data", menus);
   const { menuId } = useParams();
 
   let menuItem: Menu | undefined;
   if (menuId) {
     menuItem = menus.find((item) => item.id === parseInt(menuId, 10));
+
+    if (menuItem) {
+      const menuLocation = menuLocations.find(
+        (item) => item.menu_id === menuItem?.id
+      );
+
+      if (menuLocation) {
+        menuItem.isAvailable = menuLocation.is_available;
+      }
+    }
   }
 
   const [newMenu, setNewMenu] = useState({ name: "", price: 0 });
 
   useEffect(() => {
     if (menuItem) {
+      console.log("menuItem ", menuItem);
       setNewMenu({ name: menuItem.name, price: menuItem.price });
     }
   }, [menuItem]);
