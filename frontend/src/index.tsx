@@ -4,11 +4,16 @@ import "./index.css";
 import reportWebVitals from "./reportWebVitals";
 import router from "./routes/Router";
 import { RouterProvider } from "react-router-dom";
+import PosAppProvider from "./contexts/AppContext";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
-root.render(<RouterProvider router={router} />);
+root.render(
+  <PosAppProvider>
+    <RouterProvider router={router} />
+  </PosAppProvider>
+);
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

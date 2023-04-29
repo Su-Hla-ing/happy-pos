@@ -1,12 +1,13 @@
-import { Box, Button, TextField } from "@mui/material";
+import { Box, Button, Chip, Stack, TextField } from "@mui/material";
 import { UseAppContext } from "../contexts/AppContext";
 import Layout from "./Layout";
 import { useState } from "react";
 import { Menu } from "../typings/types";
+import { config } from "../config/config";
 
 const Menus = () => {
-  const posData = UseAppContext();
-  // console.log(posData);
+  const { fetchData, menus } = UseAppContext();
+  // console.log("Menus: ", menus);
 
   const [menu, setMenu] = useState<Menu | null>(null);
   // console.log(menu);
@@ -15,12 +16,22 @@ const Menus = () => {
     if (menu?.name.length === 0 || menu?.price === 0) {
       return;
     }
-    const response = await fetch("http://localhost:5000/menus", {
+    const response = await fetch(`${config.apiUrl}/menus`, {
       method: "POST",
       headers: { "Content-type": "application/json" },
       body: JSON.stringify(menu),
     });
+    fetchData();
   };
+
+  const handleDelete = async (menuId?: number) => {
+    if (!menuId) return;
+    const response = await fetch(`${config.apiUrl}/menus/${menuId}`, {
+      method: "DELETE",
+    });
+    fetchData();
+  };
+
   return (
     <Layout>
       <div
@@ -61,11 +72,23 @@ const Menus = () => {
             type="number"
           />
         </Box>
-        <Box sx={{ mt: "2rem" }}>
+        <Box sx={{ mt: "2rem", mb: "1.8rem" }}>
           <Button variant="contained" onClick={createMenu}>
             Create
           </Button>
         </Box>
+
+        <Stack direction="column" spacing={3}>
+          {menus.map((item) => {
+            return (
+              <Chip
+                key={item.id}
+                label={item.name}
+                onDelete={() => handleDelete(item.id)}
+              />
+            );
+          })}
+        </Stack>
       </div>
     </Layout>
   );
