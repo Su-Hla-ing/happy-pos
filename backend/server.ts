@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import { pool } from "./db/db";
+import bcrypt from "bcrypt";
 
 const app = express();
 const port = 5000;
@@ -74,19 +75,21 @@ app.post("/auth/register", async (req: Request, res: Response) => {
     password &&
     password.length > 0;
   if (!isValidUserInfo)
-    return res.send({ err: "Name, email and password are required!" });
+    return res
+      .status(404)
+      .send({ err: "Name, email and password are required!" });
 
-  const result = await pool.query(
-    "SELECT * FROM users WHERE email=$1 and password=$2 ",
-    [email, password]
-  );
-  if (result.rows.length) throw new Error("User already exists.");
+  const result = await pool.query("SELECT * FROM users WHERE email=$1", [
+    email,
+  ]);
+  if (result.rows.length) return res.status(401).send("User already exists.");
+  const hashPassword = await bcrypt.hash(password, 10);
 
   const newUser = await pool.query(
     "INSERT INTO users(name, email, password) VALUES($1, $2, $3) RETURNING *",
-    [name, email, password]
+    [name, email, hashPassword]
   );
-  console.log(newUser.rows);
+  // console.log(newUser.rows);
   res.send(newUser.rows);
 });
 
@@ -95,12 +98,16 @@ app.post("/auth/login", async (req: Request, res: Response) => {
   const isValidUserInfo =
     email && email.length > 0 && password && password.length > 0;
   if (!isValidUserInfo)
-    return res.send({ err: " email and password are required!" });
-  const result = await pool.query(
-    "SELECT * FROM users WHERE email=$1 and password=$2",
-    [email, password]
+    return res.status(404).send({ err: " email and password are required!" });
+  const result = await pool.query("SELECT * FROM users WHERE email=$1 ", [
+    email,
+  ]);
+  const isVaildPassword = await bcrypt.compare(
+    password,
+    result.rows[0].password
   );
-  if (!result.rows.length) throw new Error("Bad request. Invalid credentails.");
+  if (!isVaildPassword)
+    return res.status(401).send("Bad request. Invalid credentails.");
   res.send(result.rows);
 });
 

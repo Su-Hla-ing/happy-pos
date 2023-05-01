@@ -7,22 +7,30 @@ import {
   Alert,
 } from "@mui/material";
 import Layout from "./Layout";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { config } from "../config/config";
 
 const Login = () => {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState({ email: "", password: "" });
 
   const loginSubmit = async () => {
     const vaildUserInfo = user.email.length > 0 && user.password.length > 0;
     if (!vaildUserInfo) return setOpen(true);
-    const response = await fetch(`${config.apiUrl}/auth/login`, {
-      method: "POST",
-      headers: { "Content-type": "application/json" },
-      body: JSON.stringify(user),
-    });
+    try {
+      const response = await fetch(`${config.apiUrl}/auth/login`, {
+        method: "POST",
+        headers: { "Content-type": "application/json" },
+        body: JSON.stringify(user),
+      });
+
+      if (response.ok) return navigate("/menus?locationId=2");
+      setOpen(true);
+    } catch (error) {
+      console.log("err: ", error);
+    }
   };
 
   const handleClose = (
