@@ -62,6 +62,48 @@ app.delete("/menus/:menuId", async (req: Request, res: Response) => {
   res.send(result.rows);
 });
 
+// ===========For Register and Login Form=========
+
+app.post("/auth/register", async (req: Request, res: Response) => {
+  const { name, email, password } = req.body;
+  const isValidUserInfo =
+    name &&
+    name.length > 0 &&
+    email &&
+    email.length > 0 &&
+    password &&
+    password.length > 0;
+  if (!isValidUserInfo)
+    return res.send({ err: "Name, email and password are required!" });
+
+  const result = await pool.query(
+    "SELECT * FROM users WHERE email=$1 and password=$2 ",
+    [email, password]
+  );
+  if (result.rows.length) throw new Error("User already exists.");
+
+  const newUser = await pool.query(
+    "INSERT INTO users(name, email, password) VALUES($1, $2, $3) RETURNING *",
+    [name, email, password]
+  );
+  console.log(newUser.rows);
+  res.send(newUser.rows);
+});
+
+app.post("/auth/login", async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+  const isValidUserInfo =
+    email && email.length > 0 && password && password.length > 0;
+  if (!isValidUserInfo)
+    return res.send({ err: " email and password are required!" });
+  const result = await pool.query(
+    "SELECT * FROM users WHERE email=$1 and password=$2",
+    [email, password]
+  );
+  if (!result.rows.length) throw new Error("Bad request. Invalid credentails.");
+  res.send(result.rows);
+});
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });

@@ -121,7 +121,9 @@ const NavBar = () => {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             {pageTitle}
           </Typography>
-          <Button color="inherit">Login</Button>
+          <Link to="/login" style={{ color: "white", textDecoration: "none" }}>
+            <Button color="inherit">Login</Button>
+          </Link>
         </Toolbar>
       </AppBar>
       <Drawer anchor="left" open={open} onClose={toggleDrawer(false)}>
