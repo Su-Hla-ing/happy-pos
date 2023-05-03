@@ -1,7 +1,12 @@
+import dotenv from "dotenv";
+dotenv.config();
 import express, { Request, Response } from "express";
 import cors from "cors";
 import { pool } from "./db/db";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { config } from "./src/config/config";
+import { checkauth } from "./src/auth/auth";
 
 const app = express();
 const port = 5000;
@@ -10,7 +15,7 @@ app.use(cors());
 
 app.use(express.json());
 
-app.get("/data", async (req: Request, res: Response) => {
+app.get("/data", checkauth, async (req: Request, res: Response) => {
   const menus = await pool.query("select * from menus");
   const addons = await pool.query("select * from addons");
   const addonsCategories = await pool.query("select * from addons_categories");
@@ -28,7 +33,7 @@ app.get("/data", async (req: Request, res: Response) => {
   });
 });
 
-app.post("/menus", async (req: Request, res: Response) => {
+app.post("/menus", checkauth, async (req: Request, res: Response) => {
   const menusName = req.body.name;
   const menusPrice = req.body.price;
   const text = "INSERT INTO menus(name, price) VALUES($1, $2) RETURNING *";
@@ -38,7 +43,7 @@ app.post("/menus", async (req: Request, res: Response) => {
   res.send(result.rows);
 });
 
-app.put("/menus/:menuId", async (req: Request, res: Response) => {
+app.put("/menus/:menuId", checkauth, async (req: Request, res: Response) => {
   const menuId = req.params.menuId;
   if (!menuId) return res.send("MenuId is required");
   const updateMenusName = req.body.name;
@@ -53,7 +58,7 @@ app.put("/menus/:menuId", async (req: Request, res: Response) => {
   res.send(result.rows);
 });
 
-app.delete("/menus/:menuId", async (req: Request, res: Response) => {
+app.delete("/menus/:menuId", checkauth, async (req: Request, res: Response) => {
   const menuId = req.params.menuId;
   if (!menuId) return res.send("MenuId is required");
 
@@ -108,9 +113,15 @@ app.post("/auth/login", async (req: Request, res: Response) => {
   );
   if (!isVaildPassword)
     return res.status(401).send("Bad request. Invalid credentails.");
-  res.send(result.rows);
+  const userResult = result.rows[0];
+  const user = {
+    id: userResult.id,
+    name: userResult.name,
+    email: userResult.email,
+  };
+  const accessToken = jwt.sign(user, config.jwtSecret);
+  res.send({ accessToken });
 });
-
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });

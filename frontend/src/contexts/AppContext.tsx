@@ -16,15 +16,19 @@ interface AppContextType {
   addonCategories: AddonCategory[];
   locations: Locations[];
   menuLocations: MenuLocations[];
+  accessToken: string;
+  updateData: (value: any) => void;
   fetchData: () => void;
 }
-const defaultContext: AppContextType = {
+export const defaultContext: AppContextType = {
   menus: [],
   menuCategories: [],
   addons: [],
   addonCategories: [],
   locations: [],
   menuLocations: [],
+  accessToken: "",
+  updateData: () => {},
   fetchData: () => {},
 };
 
@@ -36,18 +40,41 @@ export const UseAppContext = () => {
 };
 
 const PosAppProvider = ({ children }: any) => {
-  const [data, setData] = useState(defaultContext);
+  const [data, updateData] = useState(defaultContext);
+
   const fetchData = async () => {
-    const response = await fetch(`${config.apiUrl}/data`);
+    const response = await fetch(`${config.apiUrl}/data`, {
+      headers: {
+        Authorization: `Bearer ${data.accessToken}`,
+      },
+    });
     const dataFromServer = await response.json();
-    setData(dataFromServer);
+    const {
+      menus,
+      menuCategories,
+      addons,
+      addonCategories,
+      locations,
+      menuLocations,
+    } = dataFromServer;
+    updateData({
+      ...data,
+      menus: menus,
+      menuCategories: menuCategories,
+      addons: addons,
+      addonCategories: addonCategories,
+      locations: locations,
+      menuLocations: menuLocations,
+    });
     console.log("DataFromServer: ", dataFromServer);
   };
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (data.accessToken) {
+      fetchData();
+    }
+  }, [data.accessToken]);
   return (
-    <AppContext.Provider value={{ ...data, fetchData }}>
+    <AppContext.Provider value={{ ...data, updateData, fetchData }}>
       {children}
     </AppContext.Provider>
   );

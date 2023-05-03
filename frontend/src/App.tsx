@@ -1,12 +1,13 @@
 import React from "react";
 import "./App.css";
 import Layout from "./components/Layout";
+import Orders from "./components/Orders";
 
 function App() {
   return (
     <div>
       <Layout>
-        <h1>hello</h1>
+        <Orders />
       </Layout>
     </div>
   );

@@ -9,6 +9,7 @@ import Layout from "./Layout";
 import { UseAppContext } from "../contexts/AppContext";
 import { Locations } from "../typings/types";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Setting = () => {
   const { locations } = UseAppContext();

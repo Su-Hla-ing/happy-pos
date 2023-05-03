@@ -10,9 +10,11 @@ import Layout from "./Layout";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { config } from "../config/config";
+import { UseAppContext } from "../contexts/AppContext";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { updateData, ...data } = UseAppContext();
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState({ email: "", password: "" });
 
@@ -26,7 +28,11 @@ const Login = () => {
         body: JSON.stringify(user),
       });
 
-      if (response.ok) return navigate("/menus?locationId=2");
+      if (response.ok) {
+        const responseData = await response.json();
+        updateData({ ...data, accessToken: responseData.accessToken });
+        return navigate("/");
+      }
       setOpen(true);
     } catch (error) {
       console.log("err: ", error);
@@ -86,6 +92,11 @@ const Login = () => {
             label="Email"
             type="email"
             variant="outlined"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                loginSubmit();
+              }
+            }}
             onChange={(e) => setUser({ ...user, email: e.target.value })}
           />
           <TextField
@@ -93,6 +104,11 @@ const Login = () => {
             label="Password"
             variant="outlined"
             type="password"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                loginSubmit();
+              }
+            }}
             onChange={(e) => setUser({ ...user, password: e.target.value })}
           />
         </Box>

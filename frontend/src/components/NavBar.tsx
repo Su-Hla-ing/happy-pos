@@ -11,6 +11,8 @@ import LocalDiningIcon from "@mui/icons-material/LocalDining";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ClassIcon from "@mui/icons-material/Class";
 import CategoryIcon from "@mui/icons-material/Category";
+import LocalMallIcon from "@mui/icons-material/LocalMall";
+
 import {
   Divider,
   Drawer,
@@ -21,27 +23,35 @@ import {
   ListItemText,
 } from "@mui/material";
 import { Link } from "react-router-dom";
+import { UseAppContext } from "../contexts/AppContext";
 
 const sidebarMenuItems = [
-  { id: 1, label: "Menus", icon: <LocalDiningIcon />, route: "/menus" },
+  { id: 1, label: "Orders", icon: <LocalMallIcon />, route: "/" },
+  { id: 2, label: "Menus", icon: <LocalDiningIcon />, route: "/menus" },
   {
-    id: 2,
+    id: 3,
     label: "Menu Categories",
     icon: <CategoryIcon />,
     route: "/menu-categories",
   },
-  { id: 3, label: "Addons", icon: <LunchDiningIcon />, route: "/addons" },
+  { id: 4, label: "Addons", icon: <LunchDiningIcon />, route: "/addons" },
   {
-    id: 4,
+    id: 5,
     label: "Addon Categories",
     icon: <ClassIcon />,
     route: "/addon-categories",
   },
-  { id: 5, label: "Settings", icon: <SettingsIcon />, route: "/settings" },
+  { id: 6, label: "Settings", icon: <SettingsIcon />, route: "/settings" },
 ];
 
 const NavBar = () => {
   const [open, setOpen] = useState<boolean>(false);
+  const { accessToken, locations } = UseAppContext();
+  const selectedLocationId = localStorage.getItem("selectedLocation");
+
+  const selectedLocation = locations.find(
+    (location) => String(location.id) === selectedLocationId
+  );
 
   const toggleDrawer =
     (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -119,10 +129,16 @@ const NavBar = () => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            {selectedLocation ? selectedLocation.name : ""}
+          </Typography>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             {pageTitle}
           </Typography>
-          <Link to="/login" style={{ color: "white", textDecoration: "none" }}>
-            <Button color="inherit">Login</Button>
+          <Link
+            to={accessToken ? "/logout" : "/login"}
+            style={{ color: "white", textDecoration: "none" }}
+          >
+            <Button color="inherit">{accessToken ? "log out" : "login"}</Button>
           </Link>
         </Toolbar>
       </AppBar>

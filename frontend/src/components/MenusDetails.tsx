@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { UseAppContext } from "../contexts/AppContext";
 import Layout from "./Layout";
 import { Menu } from "../typings/types";

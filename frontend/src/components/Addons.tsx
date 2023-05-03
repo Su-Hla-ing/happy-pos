@@ -1,5 +1,8 @@
 import { Box, TextField, Button } from "@mui/material";
 import Layout from "./Layout";
+import { useNavigate } from "react-router-dom";
+import { UseAppContext } from "../contexts/AppContext";
+import { useEffect } from "react";
 
 const Addons = () => {
   return (
