@@ -1,103 +1,111 @@
-import { useNavigate, useParams } from "react-router-dom";
-import { UseAppContext } from "../contexts/AppContext";
+import { useContext, useEffect, useState } from "react";
 import Layout from "./Layout";
+import { UseAppContext } from "../contexts/AppContext";
+import { useParams } from "react-router-dom";
+import {
+  Autocomplete,
+  Box,
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from "@mui/material";
 import { Menu } from "../typings/types";
-import { Box, Button, TextField } from "@mui/material";
 import { config } from "../config/config";
-import { useEffect, useState } from "react";
 
 const MenusDetails = () => {
-  const { menus, menuLocations } = UseAppContext();
-  console.log("data", menus);
+  const { menus, menuLocations, fetchData, menuCategories, ...data } =
+    UseAppContext();
+  console.log("menusCategories ", menuCategories);
+
+  const mappedMenuCategories = menuCategories.map((menuCategory) => ({
+    id: menuCategory.id,
+    label: menuCategory.name,
+  }));
   const { menuId } = useParams();
-
-  let menuItem: Menu | undefined;
+  let menu: Menu | undefined;
   if (menuId) {
-    menuItem = menus.find((item) => item.id === parseInt(menuId, 10));
-
-    if (menuItem) {
+    menu = menus.find((menu) => menu.id === parseInt(menuId, 10));
+    if (menu) {
       const menuLocation = menuLocations.find(
-        (item) => item.menu_id === menuItem?.id
+        (item) => item.menu_id === menu?.id
       );
-
       if (menuLocation) {
-        menuItem.isAvailable = menuLocation.is_available;
+        menu.isAvailable = menuLocation.is_available;
       }
     }
   }
-
-  const [newMenu, setNewMenu] = useState({ name: "", price: 0 });
+  const [newMenu, setMenu] = useState({ name: "", price: 0 });
 
   useEffect(() => {
-    if (menuItem) {
-      console.log("menuItem ", menuItem);
-      setNewMenu({ name: menuItem.name, price: menuItem.price });
+    if (menu) {
+      console.log("menu", menu);
+      setMenu({ name: menu.name, price: menu.price });
     }
-  }, [menuItem]);
+  }, [menu]);
 
-  const UpdateMenu = async () => {
-    const response = await fetch(`${config.apiUrl}/menus/${menuItem?.id}`, {
+  const updateMenu = async () => {
+    const response = await fetch(`${config.apiUrl}/menus/${menu?.id}`, {
       method: "PUT",
-      headers: { "Content-type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(newMenu),
     });
     console.log(await response.json());
   };
 
+  if (!menu) return null;
+
   return (
     <Layout>
-      <Box>
-        {menuItem ? (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              flexDirection: "column",
-              margin: "0 auto",
-            }}
-          >
-            <Box
-              sx={{
-                mt: "2rem",
-                display: "flex",
-                columnGap: "1.5rem",
-              }}
-            >
-              <TextField
-                id="outlined-basic"
-                label="Outlined"
-                variant="outlined"
-                defaultValue={menuItem.name}
-                onChange={(evt) => {
-                  setNewMenu({ ...newMenu, name: evt.target.value });
-                }}
-              />
-              <TextField
-                id="outlined-basic"
-                label="Outlined"
-                variant="outlined"
-                type="number"
-                defaultValue={menuItem.price}
-                onChange={(evt) => {
-                  setNewMenu({
-                    ...newMenu,
-                    price: parseInt(evt.target.value, 10),
-                  });
-                }}
-              />
-            </Box>
-            <Box sx={{ mt: "2rem", mb: "1.8rem" }}>
-              <Button variant="contained" onClick={UpdateMenu}>
-                Update Menu
-              </Button>
-            </Box>
-          </div>
-        ) : (
-          <h1>page not found</h1>
-        )}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          maxWidth: 200,
+          margin: "0 auto",
+          mt: 5,
+        }}
+      >
+        <Box>
+          <TextField
+            id="outlined-basic"
+            label="Name"
+            variant="outlined"
+            defaultValue={menu.name}
+            sx={{ mb: 2 }}
+            onChange={(evt) => setMenu({ ...newMenu, name: evt.target.value })}
+          />
+          <TextField
+            id="outlined-basic"
+            label="Price"
+            variant="outlined"
+            type="number"
+            defaultValue={menu.price}
+            sx={{ mb: 2 }}
+            onChange={(evt) =>
+              setMenu({ ...newMenu, price: parseInt(evt.target.value, 10) })
+            }
+          />
+          <Autocomplete
+            multiple
+            disablePortal
+            options={mappedMenuCategories}
+            sx={{ width: 300, mb: 2 }}
+            renderInput={(params) => (
+              <TextField {...params} label="Menu Categories" />
+            )}
+          />
+          <Button variant="contained" onClick={updateMenu}>
+            Update
+          </Button>
+        </Box>
       </Box>
     </Layout>
   );
 };
+
 export default MenusDetails;

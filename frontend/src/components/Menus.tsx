@@ -1,10 +1,22 @@
-import { Box, Button, Chip, Stack, TextField } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardMedia,
+  Chip,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { UseAppContext } from "../contexts/AppContext";
 import Layout from "./Layout";
 import { useState, useEffect } from "react";
 import { Menu } from "../typings/types";
 import { config } from "../config/config";
 import { Link } from "react-router-dom";
+import AddIcon from "@mui/icons-material/Add";
 
 const Menus = () => {
   const selectedLocation = localStorage.getItem("selectedLocation");
@@ -52,10 +64,10 @@ const Menus = () => {
           justifyContent: "center",
           alignItems: "center",
           flexDirection: "column",
-          margin: "0 auto",
+          margin: "1.8rem auto",
         }}
       >
-        <Box
+        {/* <Box
           sx={{
             mt: "2rem",
             display: "flex",
@@ -88,18 +100,54 @@ const Menus = () => {
           <Button variant="contained" onClick={createMenu}>
             Create
           </Button>
-        </Box>
+        </Box> */}
 
-        <Stack direction="column" spacing={3}>
+        <Stack direction="row" spacing={3}>
+          <Box
+            sx={{
+              width: "300px",
+              height: "300px",
+              border: "2px dotted lightgray",
+              borderRadius: 2,
+              mr: 2,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: "column",
+              cursor: "pointer",
+              userSelect: "none",
+            }}
+          >
+            <AddIcon fontSize="large" />
+            <Typography>Add new menu</Typography>
+          </Box>
           {filteredMenu.map((item) => {
             return (
-              <Link key={item.id} to={`/menus/${item.id}`}>
-                <Chip
-                  label={item.name}
-                  sx={{ cursor: "pointer" }}
-                  onDelete={() => handleDelete(item.id)}
-                />
-              </Link>
+              <>
+                <Link
+                  key={item.id}
+                  to={`/menus/${item.id}`}
+                  style={{ textDecoration: "none" }}
+                >
+                  <Card sx={{ width: "300px", height: "300px" }}>
+                    <CardMedia
+                      sx={{ height: 140 }}
+                      image="https://bit.ly/3MfJNFg"
+                      title="mote hinn khar"
+                    />
+                    <CardContent>
+                      <Typography gutterBottom variant="h5" component="div">
+                        {item.name}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Lizards are a widespread group of squamate reptiles,
+                        with over 6,000 species, ranging across all continents
+                        except Antarctica
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Link>
+              </>
             );
           })}
         </Stack>

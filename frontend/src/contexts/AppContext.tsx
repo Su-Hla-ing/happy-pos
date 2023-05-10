@@ -43,7 +43,7 @@ const PosAppProvider = ({ children }: any) => {
   const [data, updateData] = useState(defaultContext);
 
   const fetchData = async () => {
-    const response = await fetch(`${config.apiUrl}/data`, {
+    const response = await fetch(`${config.apiUrl}/menus`, {
       headers: {
         Authorization: `Bearer ${data.accessToken}`,
       },
@@ -60,11 +60,11 @@ const PosAppProvider = ({ children }: any) => {
     updateData({
       ...data,
       menus: menus,
-      menuCategories: menuCategories,
-      addons: addons,
-      addonCategories: addonCategories,
-      locations: locations,
-      menuLocations: menuLocations,
+      menuCategories,
+      addons,
+      addonCategories,
+      locations,
+      menuLocations,
     });
     console.log("DataFromServer: ", dataFromServer);
   };
