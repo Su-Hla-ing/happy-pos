@@ -1,23 +1,13 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Layout from "./Layout";
 import { UseAppContext } from "../contexts/AppContext";
 import { useParams } from "react-router-dom";
-import {
-  Autocomplete,
-  Box,
-  Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-} from "@mui/material";
+import { Autocomplete, Box, Button, TextField } from "@mui/material";
 import { Menu } from "../typings/types";
 import { config } from "../config/config";
 
 const MenusDetails = () => {
-  const { menus, menuLocations, fetchData, menuCategories, ...data } =
-    UseAppContext();
+  const { menus, menuLocations, menuCategories } = UseAppContext();
   console.log("menusCategories ", menuCategories);
 
   const mappedMenuCategories = menuCategories.map((menuCategory) => ({

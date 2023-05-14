@@ -8,18 +8,26 @@ interface MenuQueries {
 }
 export const menuQueries: MenuQueries = {
   createMenu: async (createMenuParams: CreateMenuParams) => {
-    const { name, price, locationIds } = createMenuParams;
-    const text = "INSERT INTO menus(name, price) VALUES($1, $2) RETURNING *";
-    const values = [name, price];
+    const { name, price, locationIds, imageUrl } = createMenuParams;
+    const text =
+      "INSERT INTO menus(name, price, image_url) VALUES($1, $2, $3) RETURNING *";
+    const values = [name, price, imageUrl];
     const result = await pool.query(text, values);
     // console.log(result.rows);
     const menu = result.rows[0] as Menu;
+    console.log(menu);
     const menuId = menu.id as string;
-    await pool.query(
-      `insert into menus_locations (menu_id, location_id) select * from unnest ($1::int[], $2::[int]`,
-      [Array(locationIds.length).fill(menuId), locationIds]
+    console.log("menuid...", menuId);
+    const imgUrl = menu.imageUrl as string;
+
+    const locationResult = await pool.query("select * from menus_locations");
+
+    const locationId: string[] = locationResult.rows.map(
+      (item) => item.location_id
     );
-    return { id: menuId, name, price, locationIds };
+    console.log(locationId);
+
+    return { id: menuId, name, price, locationIds: locationId };
   },
 
   getMenu: async (menuId: string) => {

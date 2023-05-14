@@ -2,6 +2,8 @@ import express, { Request, Response } from "express";
 import { checkauth } from "../auth/auth";
 import { pool } from "../../db/db";
 import { menuQueries } from "../queries/menuQueries";
+import { fileUpload } from "../libs/fileUpload";
+import { config } from "../config/config";
 export const menusRouter = express.Router();
 
 menusRouter.get("/:menuId", async (req: Request, res: Response) => {
@@ -10,10 +12,41 @@ menusRouter.get("/:menuId", async (req: Request, res: Response) => {
   res.send(menu);
 });
 
-menusRouter.post("/", checkauth, async (req: Request, res: Response) => {
-  const { name, price, locationIds } = req.body;
-  const menu = await menuQueries.createMenu({ name, price, locationIds });
-  res.send(menu);
+menusRouter.post("/", async (req: Request, res: Response) => {
+  try {
+    fileUpload(req, res, async (error: any) => {
+      if (error) {
+        return res.send(error);
+      }
+      console.log(req.body.menu);
+
+      // const { name, price }: { name: string; price: number } = JSON.parse(
+      //   req.body.menu
+      // );
+      // const locationIds = JSON.parse(req.body.locationIds);
+      const { name, price, locationIds } = JSON.parse(req.body.menu);
+      console.log("locationIds", locationIds);
+
+      const [{ originalname }]: any = req.files;
+      console.log(originalname);
+
+      const imageUrl = `${config.spaceEndpoint}/happy-pos/su-hlaing/${originalname}`;
+
+      console.log("imageUrl", imageUrl);
+
+      const menus = await menuQueries.createMenu({
+        name,
+        price,
+        locationIds,
+        imageUrl,
+      });
+      console.log("menu..", menus);
+      res.sendStatus(200);
+      res.send(menus);
+    });
+  } catch (error) {
+    res.sendStatus(500);
+  }
 });
 
 menusRouter.put("/:menuId", checkauth, async (req: Request, res: Response) => {
